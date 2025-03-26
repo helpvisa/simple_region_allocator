@@ -1,7 +1,7 @@
 .POSIX:
 .SUFFIXES:
 .SUFFIXES: .c .o
-.PHONY: all run clean
+.PHONY: all test clean
 
 SHELL = /bin/sh
 
@@ -10,13 +10,13 @@ CFLAGS = -Wall
 
 all: build
 
-run: build
+test: build
 	./arenas
 
 build: main.o
 	$(CC) $(CFLAGS) -o ./arenas ./main.o
 
-main.o: main.c
+main.o: main.c region.h
 	$(CC) $(CLFAGS) -c ./main.c -o ./main.o
 
 clean:
