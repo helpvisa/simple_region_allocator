@@ -18,6 +18,8 @@ struct Region {
 /* forward-declare functions */
 struct Region *new_region(size_t size);
 void *region_alloc(struct Region *region, size_t size);
+void region_reset(struct Region *region);
+void region_free(struct Region *region);
 
 #ifdef DEBUG_REGIONS
 #include <stdio.h>
@@ -36,10 +38,11 @@ struct Region *new_region(size_t size) {
 
     /* store the Region struct at the beginning of its own allocated memory */
     struct Region *region = (struct Region *)memory;
-    region->capacity = size - sizeof(*region);
+    region->capacity = size;
     /* offset the data pointer to skip the self-allocated region */
     region->data = (char *)memory + sizeof(*region);
-    region->size = 0;
+    region->size = sizeof(*region);
+    region->next = NULL;
 
     return region;
 }
@@ -48,12 +51,47 @@ struct Region *new_region(size_t size) {
 void *region_alloc(struct Region *region, size_t size) {
     void *new_allocation = NULL;
 
-    if (size > 0 && region->capacity - region->size >= size) {
-        new_allocation = region->data + region->size;
-        region->size += size;
+    if (size < 1 || size > region->capacity - sizeof(*region)) {
+#ifdef DEBUG_REGIONS
+        printf("ERR: attempted to insert an object with no size, "
+               "or an object larger than maximum arena capacity.\n");
+#endif
+        return new_allocation;
     }
 
+    if (region->capacity - region->size >= size) {
+        new_allocation = region->data + region->size;
+        region->size += size;
+    } else {
+        if (!region->next) {
+            region->next = new_region(region->capacity);
+        }
+        /* check again; allocation may have failed */
+        if (region->next) {
+            new_allocation = region_alloc(region->next, size);
+        }
+    }
     return new_allocation;
+}
+
+/* clear a given region by resetting its size to default */
+void region_reset(struct Region *region) {
+    region->size = sizeof(*region);
+    /* if there's another region linked to this,
+       might as well go ahead and reset that one too */
+    if (region->next) {
+        region_reset(region->next);
+    }
+}
+
+/* free a given region, and all of its connected regions */
+void region_free(struct Region *region) {
+    if (region->next) {
+        region_free(region->next);
+    }
+    /* region is stored within itself, so freeing region also
+       automatically frees the data pointer */
+    free(region);
 }
 #endif
 
@@ -83,10 +121,10 @@ void print_region(struct Region *region, char format) {
         break;
     }
 
-    printf("%d%s used of %d%s total; %d%s free\n",
+    printf("%d%s used | %d%s free | %d%s total\n",
            size, postfix,
-           capacity, postfix,
-           free, postfix);
+           free, postfix,
+           capacity, postfix);
 }
 
 /* visualize a memory region with ASCII art */
