@@ -33,7 +33,8 @@ void visualize_region(struct Region *region, int step);
 struct Region *new_region(size_t size) {
     void *memory = malloc(size);
     if (!memory) {
-        return NULL;
+        abort();
+        /* return NULL; */
     }
 
     /* store the Region struct at the beginning of its own allocated memory */
@@ -60,16 +61,13 @@ void *region_alloc(struct Region *region, size_t size) {
     }
 
     if (region->capacity - region->size >= size) {
-        new_allocation = region->data + region->size;
+        new_allocation = region->data;
         region->size += size;
     } else {
         if (!region->next) {
             region->next = new_region(region->capacity);
         }
-        /* check again; allocation may have failed */
-        if (region->next) {
-            new_allocation = region_alloc(region->next, size);
-        }
+        new_allocation = region_alloc(region->next, size);
     }
     return new_allocation;
 }
@@ -78,9 +76,11 @@ void *region_alloc(struct Region *region, size_t size) {
 void region_reset(struct Region *region) {
     region->size = sizeof(*region);
     /* if there's another region linked to this,
-       might as well go ahead and reset that one too */
+       might as well go ahead and free it, since
+       it's only accessed via this one */
     if (region->next) {
-        region_reset(region->next);
+        region_free(region->next);
+        region->next = NULL;
     }
 }
 
@@ -88,8 +88,9 @@ void region_reset(struct Region *region) {
 void region_free(struct Region *region) {
     if (region->next) {
         region_free(region->next);
+        region->next = NULL;
     }
-    /* region is stored within itself, so freeing region also
+    /* region is stored within itself, so freeing region itself also
        automatically frees the data pointer */
     free(region);
 }
