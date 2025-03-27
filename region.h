@@ -128,7 +128,7 @@ void print_region(struct Region *region, char format) {
         break;
     }
 
-    printf("%d%s used | %d%s free | %d%s total\n",
+    printf("%8d%s used %8d%s free %8d%s total\n",
            size, postfix,
            free, postfix,
            capacity, postfix);
