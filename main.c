@@ -71,7 +71,10 @@ int main(int argc, char *argv[]) {
         visualize_region(current_region, 1024 * visual_multiplier);
         current_region = current_region->next;
     }
-    printf("\nTotal memory used: %luMB\n", total_memory_used / (1024 * 1024));
+    printf("\nTotal memory used: %.2lfkb | %.2lfmb | %.2lfgb\n",
+           (double)total_memory_used / 1024,
+           (double)total_memory_used / (1024 * 1024),
+           (double)total_memory_used / (1024 * 1024 * 1024));
 
     printf("\nResetting regions...\n\n");
     region_reset(test_region);
