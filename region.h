@@ -42,7 +42,7 @@ struct Region *new_region(size_t size) {
     struct Region *region = (struct Region *)memory;
     region->capacity = size;
     /* offset the data pointer to skip the self-allocated region */
-    region->data = (char *)memory + sizeof(*region);
+    region->data = (char *)memory;
     region->size = sizeof(*region);
     region->next = NULL;
 
@@ -62,7 +62,7 @@ void *region_alloc(struct Region *region, size_t size) {
     }
 
     if (region->capacity - region->size >= size) {
-        new_allocation = region->data;
+        new_allocation = region->data + region->size;
         region->size += size;
     } else {
         if (!region->next) {
