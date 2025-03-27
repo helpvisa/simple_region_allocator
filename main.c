@@ -18,6 +18,7 @@ struct Object *create_object(struct Region *region) {
 
 int main(int argc, char *argv[]) {
     /* 256MB regions */
+    size_t total_memory_used = 0;
     struct Region *test_region = new_region(REGION_SIZE * 256);
     struct Region *current_region = test_region;
 
@@ -41,10 +42,12 @@ int main(int argc, char *argv[]) {
     printf("\n");
     current_region = test_region;
     while (current_region) {
+        total_memory_used += get_region_memory_use(current_region);
         print_region(current_region, 'm');
         visualize_region(current_region, 1024 * 1024 * 8);
         current_region = current_region->next;
     }
+    printf("\nTotal memory used: %luMB\n", total_memory_used / (1024 * 1024));
 
     printf("\nResetting regions...\n");
     region_reset(test_region);

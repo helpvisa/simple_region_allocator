@@ -23,6 +23,7 @@ void region_free(struct Region *region);
 
 #ifdef DEBUG_REGIONS
 #include <stdio.h>
+size_t get_region_memory_use(struct Region *region);
 void print_region(struct Region *region, char format);
 void visualize_region(struct Region *region, int step);
 #endif
@@ -97,6 +98,11 @@ void region_free(struct Region *region) {
 #endif
 
 #ifdef DEBUG_REGIONS
+/* return the amount of memory consumed by region (in bytes) */
+size_t get_region_memory_use(struct Region *region) {
+    return region->size;
+}
+
 /* print memory used by region */
 void print_region(struct Region *region, char format) {
     int size = region->size;
