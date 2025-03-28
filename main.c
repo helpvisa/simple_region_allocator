@@ -4,6 +4,12 @@
 #define DEBUG_REGIONS
 #include "region.h"
 
+#ifdef __cplusplus
+#define cast_ptr(p) (decltype(p))
+#else
+#define cast_ptr(...)
+#endif
+
 struct Object {
     float value;
     int number;
@@ -11,9 +17,9 @@ struct Object {
 };
 
 struct Object *create_object(struct Region *region) {
-    struct Object *new_object = region_alloc(region, sizeof(*new_object));
-    new_object->next = NULL;
-    return new_object;
+    struct Object *obj = cast_ptr(obj)region_alloc(region, sizeof(*obj));
+    obj->next = NULL;
+    return obj;
 }
 
 int main(int argc, char *argv[]) {

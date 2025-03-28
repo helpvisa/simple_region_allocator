@@ -11,7 +11,7 @@
 struct Region {
     size_t capacity;
     size_t size;
-    void *data;
+    char *data;
 
     struct Region *next;
 };
@@ -115,16 +115,16 @@ void print_region(struct Region *region, char format) {
         size /= 1024;
         capacity /= 1024;
         free /= 1024;
-        postfix = "kb\0";
+        postfix = (char *)"kb\0";
         break;
     case 'm':
         size /= (1024 * 1024);
         capacity /= (1024 * 1024);
         free /= (1024 * 1024);
-        postfix = "mb\0";
+        postfix = (char *)"mb\0";
         break;
     default:
-        postfix = "b\0";
+        postfix = (char *)"b\0";
         break;
     }
 
