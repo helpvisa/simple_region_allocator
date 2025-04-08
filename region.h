@@ -18,7 +18,7 @@ struct Region {
 /* forward-declare functions */
 struct Region *new_region(size_t size);
 void *region_alloc(struct Region *region, size_t size);
-void region_reset(struct Region *region);
+void region_reset(struct Region *region, int free_next_region);
 void region_free(struct Region *region);
 
 #ifdef DEBUG_REGIONS
@@ -74,14 +74,20 @@ void *region_alloc(struct Region *region, size_t size) {
 }
 
 /* clear a given region by resetting its size to default */
-void region_reset(struct Region *region) {
+void region_reset(struct Region *region, int free_next_region) {
     region->size = sizeof(*region);
     /* if there's another region linked to this,
-       might as well go ahead and free it, since
-       it's only accessed via this one */
-    if (region->next) {
-        region_free(region->next);
-        region->next = NULL;
+       we will only free it if specifically requested */
+    if (free_next_region) {
+        if (region->next) {
+            region_free(region->next);
+            region->next = NULL;
+        }
+    } else {
+        if (region->next) {
+            region_reset(region->next, 0);
+            region->next = NULL;
+        }
     }
 }
 
