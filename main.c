@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
            (double)total_memory_used / (1024 * 1024 * 1024));
 
     printf("\nResetting regions...\n\n");
-    region_reset(test_region);
+    region_reset(test_region, 1);
     current_region = test_region;
     while (current_region) {
         print_region(current_region, 'm');
