@@ -1,5 +1,5 @@
 # Simple Region Allocator
-No-nonsense region / stack allocator for your C and C++ projects.
+Basic region / stack allocator for your C and C++ projects.
 
 ## Using the Library
 Include `region.h` in every file that it's needed. Make sure to include
