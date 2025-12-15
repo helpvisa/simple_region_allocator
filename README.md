@@ -21,5 +21,6 @@ additional arguments, as follows:
 ./arenas [ENABLE_DEBUG_PRINTING] \
          [NUMBER_OF_THREADS]     \
          [OBJECT_MULTIPLIER]     \
+         [REGION_SIZE]           \
          [VISUAL_SCALE]
 ```
